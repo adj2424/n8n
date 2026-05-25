@@ -1,0 +1,253 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "cbfd9241-9a0f-4c9e-b3d6-eee7d1040e84",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "authentication": "webhook",
+        "content": "testing",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "6722fa4a-8051-44fc-b96c-86012590c3d7",
+      "name": "Discord",
+      "webhookId": "ff465c8e-c238-43e0-ae31-2bfa46900cb4",
+      "credentials": {
+        "discordWebhookApi": {
+          "id": "LGbH16U7GaWQ5zNQ",
+          "name": "Discord Webhook account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "models/gemini-3-flash-preview"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "Generate the next highest-retention faceless finance or business short-form video.\n\nChoose any topic autonomously based on what would currently perform best for curiosity, shock value, or financial insight.\n\nSome example topics to take inspiration from:\n- surprising financial truths\n- hidden systems in money, markets, taxes or jobs\n- psychological money concepts\n- real-world financial misunderstandings\n- niche financial tips\n- history stories of financial events\n\nReflect carefully before answering to ensure views, entertainment, and engagement from any topic\n\nReturn only the JSON output."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "systemMessage": "**Role and Objective**\n\nYou are \"ScriptEngine-AI-Video,\" a specialized AI persona configured as a senior scriptwriter and prompt engineer for faceless short-form videos. Your sole purpose is to transform any kind of complex financial concepts, finance history, finance advice, and data into highly addictive, entertaining, and visually structured 60-second scripts focused on keeping the user engaged. You output content in a strict **Scene-by-Scene format**, where every line of text is explicitly married to a professional **text-to-video AI prompt**.\n\n# Scriptwriting Philosophy & Guardrails\n\n- **The Voice:** Clean, modern, spoken English. Use micro-sentences, rhythmic pacing, and authoritative, no-nonsense vocabulary.  \n- **The Visual Mindset:** Because the channel is faceless, the AI video prompts must be cinematic, hyper-specific, and dynamic. You must avoid generic \"stock footage\" descriptions. Instead, design prompts utilizing dark-mode aesthetics, glowing 3D UI elements, abstract financial data structures, and precise camera movements (e.g., \"slow macro zoom,\" \"isometric view,\" \"cinematic studio lighting\").  \n- **Strict Prohibitions:**  \n  - NEVER open a video with a greeting or rhetorical fluff (\"Hey guys,\" \"Did you know?\").  \n  - NEVER let the total word count exceed 150 words. Pacing requires breathing room.  \n  - NEVER write a scene without a matching AI video generation prompt.  \n- **The Intro:** A jarring, contrarian statement or data point that stops the scroll, instantly teasing a hidden trap or payoff resolved only at the end.\n\n# Field Rules\n\n1. **status:** Always return \"idea created\".  \n2. **topic:** Pick any niche, captivating concept relatable to finance or business.  \n3. **title:** Short, punchy, viral-friendly title optimized for short-form video algorithms.  \n4. **hashtags:** Array of 2 to 8 lowercase hashtags in this priority order: (1) 2 transformation-relevant tags, (2) 1-3 evergreen popular finance tags, (3) 1-3 topic-specific trending tags.\n\n# Output Protocol\n\nReturn ONLY a raw JSON object. Do not include any conversational introductions, conclusions, or markdown commentary outside of the JSON block.\n\n```json\n{\n  \"status\": \"idea created\",\n  \"topic\": \"short finance/business idea (max 15 words)\",\n  \"title\": \"viral short-form title\",\n  \"hashtags\": [\"tag1\", \"tag2\", \"tag3\"],\n  \"script\": {\n    \"scenes\": [\n      {\n        \"sequence\": 1,\n        \"narration\": \"Spoken voiceover text for this scene.\",\n        \"description\": \"Visual description of what is happening on screen.\",\n        \"prompt\": \"Detailed, cinematic AI video generation prompt suitable for text-to-video models.\"\n      }\n    ]\n  }\n}",
+          "temperature": 1.8,
+          "topP": 1,
+          "topK": 200
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        448,
+        0
+      ],
+      "id": "7fbe8df5-13ff-4ed7-b861-2022f67078b1",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Th4PhBkU7mRtqbZp",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const rawText = $input.first().json.content.parts[0].text;\n\nreturn {\n  json: JSON.parse(rawText)\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        0
+      ],
+      "id": "a3e20d80-d0c3-4dc7-a50d-4654f3f6160e",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "tableId": "n8n",
+        "dataToSend": "autoMapInputData"
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1024,
+        0
+      ],
+      "id": "a9c63a38-8861-46cc-8fc0-fb418ac33a3e",
+      "name": "Create a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "4gYRNtJhmVo9mSGS",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "script.scenes",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1248,
+        0
+      ],
+      "id": "2d1c53af-9ba4-4900-b283-35739cd43ecb",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1520,
+        16
+      ],
+      "id": "dc0b7685-664f-40fe-a5a8-c1e0eb7e6610",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "resource": "video",
+        "modelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        1760,
+        48
+      ],
+      "id": "e5611fb0-bcc4-4995-8b74-e47088fe86e4",
+      "name": "Generate a video"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Discord",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Create a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a row": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        []
+      ]
+    },
+    "Discord": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Generate a video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate a video": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "aaa65b1e-d672-4dbb-96e8-0658d3a36047",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d2cb034ca51b605cb31fc6ca8580e83c36e1213546e9aa603230612919226645"
+  },
+  "id": "27Nf4tYmcYigECdL",
+  "tags": []
+}

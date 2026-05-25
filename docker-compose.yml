@@ -1,0 +1,15 @@
+services:
+  n8n:
+    build: .
+    ports:
+      - '8080:8080'
+    environment:
+      - TZ=America/New_York
+      - N8N_PORT=8080
+      #- N8N_BLOCK_SVC_EXECUTION_FROM_COMMAND=false
+    volumes:
+      - n8n_data:/home/node/.n8n
+      #- ./files:/files
+
+volumes:
+  n8n_data:
