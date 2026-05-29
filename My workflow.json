@@ -7,7 +7,7 @@
       "typeVersion": 1,
       "position": [
         0,
-        -96
+        80
       ],
       "id": "cbfd9241-9a0f-4c9e-b3d6-eee7d1040e84",
       "name": "When clicking ‘Execute workflow’"
@@ -22,7 +22,7 @@
       "typeVersion": 2,
       "position": [
         224,
-        -96
+        80
       ],
       "id": "6722fa4a-8051-44fc-b96c-86012590c3d7",
       "name": "Discord",
@@ -60,7 +60,7 @@
       "typeVersion": 1.2,
       "position": [
         448,
-        -96
+        80
       ],
       "id": "7fbe8df5-13ff-4ed7-b861-2022f67078b1",
       "name": "Message a model",
@@ -79,7 +79,7 @@
       "typeVersion": 2,
       "position": [
         800,
-        -96
+        80
       ],
       "id": "a3e20d80-d0c3-4dc7-a50d-4654f3f6160e",
       "name": "Code in JavaScript"
@@ -93,7 +93,7 @@
       "typeVersion": 1,
       "position": [
         1024,
-        -96
+        80
       ],
       "id": "a9c63a38-8861-46cc-8fc0-fb418ac33a3e",
       "name": "Create a row",
@@ -113,7 +113,7 @@
       "typeVersion": 1,
       "position": [
         1248,
-        -96
+        80
       ],
       "id": "2d1c53af-9ba4-4900-b283-35739cd43ecb",
       "name": "Split Out"
@@ -126,7 +126,7 @@
       "typeVersion": 3,
       "position": [
         1472,
-        -96
+        80
       ],
       "id": "dc0b7685-664f-40fe-a5a8-c1e0eb7e6610",
       "name": "Loop Over Items"
@@ -146,8 +146,8 @@
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1.2,
       "position": [
-        32,
-        192
+        0,
+        576
       ],
       "id": "e5611fb0-bcc4-4995-8b74-e47088fe86e4",
       "name": "Generate a video",
@@ -182,7 +182,7 @@
       "typeVersion": 3.4,
       "position": [
         1696,
-        -240
+        -64
       ],
       "id": "f50d27cc-e1da-4388-bd01-8b8af74cfb5e",
       "name": "Edit Fields"
@@ -196,7 +196,7 @@
       "typeVersion": 1.1,
       "position": [
         1696,
-        -48
+        128
       ],
       "id": "df58718a-2057-457d-801b-ef6cc50c47b8",
       "name": "Extract from File"
@@ -209,7 +209,7 @@
       "typeVersion": 1.1,
       "position": [
         224,
-        176
+        576
       ],
       "id": "f00c36c4-bb09-4128-b3ca-85a9bce82650",
       "name": "Wait",
@@ -229,11 +229,40 @@
       "type": "n8n-nodes-base.sort",
       "typeVersion": 1,
       "position": [
-        1904,
-        -240
+        1920,
+        -64
       ],
       "id": "a4d65155-13f7-451f-b845-715cf4ba9493",
       "name": "Sort"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=/home/node/.n8n-files/part_{{$json.sequence}}.mp4",
+        "dataPropertyName": "=video",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        2368,
+        -64
+      ],
+      "id": "ef10ff71-5bc9-4cff-bc1d-08de24c2086e",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "jsCode": "const list = $(\"Convert Base64 to Binary\").all()\n  // matches earlier filename when it is saved\n  .map(item => `file '/files/part_${item.json.sequence}.mp4'`)\n  .join('\\n')\n\nreturn [\n  {\n    json: {\n      list\n    }\n  }\n]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2592,
+        -64
+      ],
+      "id": "b7a00da2-1990-4bfc-9761-cdec1acc4b2d",
+      "name": "Code in JavaScript2"
     },
     {
       "parameters": {
@@ -242,68 +271,11 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2176,
-        -240
+        2144,
+        -64
       ],
       "id": "7a327410-eb9a-487b-bcd5-9972d4d3a4ed",
-      "name": "Code in JavaScript1"
-    },
-    {
-      "parameters": {
-        "operation": "write",
-        "fileName": "=/tmp/part_{{ $json.sequence }}.mp4",
-        "dataPropertyName": "=video",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.readWriteFile",
-      "typeVersion": 1.1,
-      "position": [
-        2512,
-        -224
-      ],
-      "id": "ef10ff71-5bc9-4cff-bc1d-08de24c2086e",
-      "name": "Read/Write Files from Disk"
-    },
-    {
-      "parameters": {
-        "jsCode": "const list = $(\"Code in JavaScript1\").all()\n  // matches earlier filename when it is saved\n  .map(item => `file '/tmp/part_${item.json.sequence}.mp4'`)\n  .join('\\n')\n\nreturn [\n  {\n    json: {\n      list\n    }\n  }\n]"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        2720,
-        -224
-      ],
-      "id": "b7a00da2-1990-4bfc-9761-cdec1acc4b2d",
-      "name": "Code in JavaScript2"
-    },
-    {
-      "parameters": {
-        "operation": "write",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.readWriteFile",
-      "typeVersion": 1.1,
-      "position": [
-        3232,
-        -288
-      ],
-      "id": "5bfdc426-1698-4561-8b92-5d0fef124a8b",
-      "name": "Read/Write Files from Disk1"
-    },
-    {
-      "parameters": {
-        "operation": "toText",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.convertToFile",
-      "typeVersion": 1.1,
-      "position": [
-        3072,
-        -80
-      ],
-      "id": "dc082368-3f86-4a97-a95f-9e34dbdf408e",
-      "name": "Convert to File"
+      "name": "Convert Base64 to Binary"
     }
   ],
   "pinData": {
@@ -538,18 +510,7 @@
       "main": [
         [
           {
-            "node": "Code in JavaScript1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Code in JavaScript1": {
-      "main": [
-        [
-          {
-            "node": "Read/Write Files from Disk",
+            "node": "Convert Base64 to Binary",
             "type": "main",
             "index": 0
           }
@@ -571,6 +532,17 @@
       "main": [
         []
       ]
+    },
+    "Convert Base64 to Binary": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
@@ -579,7 +551,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "10f74af3-1e75-4f7c-83b9-8614f774a090",
+  "versionId": "28bf9bc9-d5f4-45c8-a228-ca4df9bacad1",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "d2cb034ca51b605cb31fc6ca8580e83c36e1213546e9aa603230612919226645"

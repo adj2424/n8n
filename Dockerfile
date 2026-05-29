@@ -9,4 +9,7 @@ RUN wget -q https://dl-cdn.alpinelinux.org/alpine/v3.22/main/x86_64/apk-tools-2.
 
 RUN apk update && apk add --no-cache ffmpeg
 
+# Create the directory for file access and set permissions
+RUN mkdir -p /home/node/.n8n-files && chown node:node /home/node/.n8n-files
+
 USER node
