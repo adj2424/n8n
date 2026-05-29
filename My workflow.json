@@ -7,7 +7,7 @@
       "typeVersion": 1,
       "position": [
         0,
-        0
+        -96
       ],
       "id": "cbfd9241-9a0f-4c9e-b3d6-eee7d1040e84",
       "name": "When clicking ‘Execute workflow’"
@@ -22,7 +22,7 @@
       "typeVersion": 2,
       "position": [
         224,
-        0
+        -96
       ],
       "id": "6722fa4a-8051-44fc-b96c-86012590c3d7",
       "name": "Discord",
@@ -60,7 +60,7 @@
       "typeVersion": 1.2,
       "position": [
         448,
-        0
+        -96
       ],
       "id": "7fbe8df5-13ff-4ed7-b861-2022f67078b1",
       "name": "Message a model",
@@ -79,7 +79,7 @@
       "typeVersion": 2,
       "position": [
         800,
-        0
+        -96
       ],
       "id": "a3e20d80-d0c3-4dc7-a50d-4654f3f6160e",
       "name": "Code in JavaScript"
@@ -93,7 +93,7 @@
       "typeVersion": 1,
       "position": [
         1024,
-        0
+        -96
       ],
       "id": "a9c63a38-8861-46cc-8fc0-fb418ac33a3e",
       "name": "Create a row",
@@ -113,7 +113,7 @@
       "typeVersion": 1,
       "position": [
         1248,
-        0
+        -96
       ],
       "id": "2d1c53af-9ba4-4900-b283-35739cd43ecb",
       "name": "Split Out"
@@ -125,8 +125,8 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        1520,
-        16
+        1472,
+        -96
       ],
       "id": "dc0b7685-664f-40fe-a5a8-c1e0eb7e6610",
       "name": "Loop Over Items"
@@ -136,22 +136,281 @@
         "resource": "video",
         "modelId": {
           "__rl": true,
+          "value": "models/veo-3.1-lite-generate-preview",
           "mode": "list",
-          "value": ""
+          "cachedResultName": "models/veo-3.1-lite-generate-preview"
         },
+        "prompt": "={{ $json.prompt }}",
         "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1.2,
       "position": [
-        1760,
-        48
+        32,
+        192
       ],
       "id": "e5611fb0-bcc4-4995-8b74-e47088fe86e4",
-      "name": "Generate a video"
+      "name": "Generate a video",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Th4PhBkU7mRtqbZp",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a08eb7c7-78cb-4733-820e-4af5d173b63a",
+              "name": "data",
+              "value": "={{ $json.data }}",
+              "type": "string"
+            },
+            {
+              "id": "6f81ad5c-c3eb-49f2-a1fd-088364bcd1d9",
+              "name": "sequence",
+              "value": "={{ $('Split Out').item.json.sequence }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1696,
+        -240
+      ],
+      "id": "f50d27cc-e1da-4388-bd01-8b8af74cfb5e",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        1696,
+        -48
+      ],
+      "id": "df58718a-2057-457d-801b-ef6cc50c47b8",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "amount": 30
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        224,
+        176
+      ],
+      "id": "f00c36c4-bb09-4128-b3ca-85a9bce82650",
+      "name": "Wait",
+      "webhookId": "9e6ce976-f80e-43c5-b74e-cc6e0fd824b0"
+    },
+    {
+      "parameters": {
+        "sortFieldsUi": {
+          "sortField": [
+            {
+              "fieldName": "sequence"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.sort",
+      "typeVersion": 1,
+      "position": [
+        1904,
+        -240
+      ],
+      "id": "a4d65155-13f7-451f-b845-715cf4ba9493",
+      "name": "Sort"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $('Sort').all().map(item => {\n  return {\n    json: item.json,\n    binary: {\n      video: {\n        data: item.json.data,\n        mimeType: 'video/mp4',\n        fileName: `part_${item.json.sequence}.mp4`\n      }\n    }\n  }\n})"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2176,
+        -240
+      ],
+      "id": "7a327410-eb9a-487b-bcd5-9972d4d3a4ed",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=/tmp/part_{{ $json.sequence }}.mp4",
+        "dataPropertyName": "=video",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        2512,
+        -224
+      ],
+      "id": "ef10ff71-5bc9-4cff-bc1d-08de24c2086e",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "jsCode": "const list = $(\"Code in JavaScript1\").all()\n  // matches earlier filename when it is saved\n  .map(item => `file '/tmp/part_${item.json.sequence}.mp4'`)\n  .join('\\n')\n\nreturn [\n  {\n    json: {\n      list\n    }\n  }\n]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2720,
+        -224
+      ],
+      "id": "b7a00da2-1990-4bfc-9761-cdec1acc4b2d",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        3232,
+        -288
+      ],
+      "id": "5bfdc426-1698-4561-8b92-5d0fef124a8b",
+      "name": "Read/Write Files from Disk1"
+    },
+    {
+      "parameters": {
+        "operation": "toText",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        3072,
+        -80
+      ],
+      "id": "dc082368-3f86-4a97-a95f-9e34dbdf408e",
+      "name": "Convert to File"
     }
   ],
-  "pinData": {},
+  "pinData": {
+    "Split Out": [
+      {
+        "json": {
+          "prompt": "Cinematic macro shot of a crystalline 3D dollar symbol disintegrating into streams of neon blue binary code, black background, high technical detail, octane render, 8kd, volumetric floating particles.",
+          "sequence": 1,
+          "narration": "Most people think Dollars belong to the Federal Reserve. They're wrong. Use your eyes: the real money has no home.",
+          "description": "Macro shot of a glowing blue dollar sign dissolving into raw digital binary code in a deep black Void."
+        }
+      },
+      {
+        "json": {
+          "prompt": "Isometric 3D blueprint of a futuristic New York and London connected by glowing green ethernet cables undersea, dark matte aesthetic, architectural visualization, micro-mapping light pulse, cinematic shadows.",
+          "sequence": 2,
+          "narration": "Welcome to Eurodollars. Trillions of digital IOUs held by banks outside the U.S. total visual ghosts, beyond tax, and purely unregulated logic.",
+          "description": "An isometric 3D grid layout showing translucent skyscraper blocks representing international banks pulses with green connection lines across oceans."
+        }
+      }
+    ],
+    "Create a row": [
+      {
+        "json": {
+          "id": "b8ccb3a5-4288-455e-af93-4fdc5689034d",
+          "created_at": "2026-05-27T04:04:24.191412+00:00",
+          "status": "idea created",
+          "topic": "The Cantillon Effect: Why wealth timing ruins your savings.",
+          "title": "Exposure: The Proximity Glitch",
+          "hashtags": "[\"wealthblueprint\",\"finiticartel\",\"finance\",\"macrohistory\",\"investingtips\",\"secretsformillionairs\"]",
+          "script": {
+            "scenes": [
+              {
+                "prompt": "Cinematic high-angle macro shot, industrial dollar printing press, dark green vaporware aesthetic, ink glowing digitally light, high-end production textures, slow hardware movement.",
+                "sequence": 1,
+                "narration": "If a government prints a billion dollars at midnight, they don’t drop it into your mailbox.",
+                "description": "Macro-cinematic shot of an industrial printing press spewing fresh US Hundred dollar bills into deep shadow; neon green glowing pulses traveling through the ink."
+              },
+              {
+                "prompt": "Isometric glowing luxury 3D network, golden skyscraper nodes interconnected by liquid gold lightning, dark liquid marble environment, high resolution f/2.8 lens blur.",
+                "sequence": 2,
+                "narration": "They feed it to a circuit of mega-institutions. These players spend it at high yesterday’s value-per-dollar perfectly oblivious to inflation.",
+                "description": "Abstract silver interconnected nodes pulsing like a global electrical grid, focusing on golden skyscraper terminals located at the center centers.",
+                "html_desc_short": "The flow is instant, providing prime mover advantage."
+              },
+              {
+                "prompt": "Generative digital geography map view, neon micro circuits fading to darkness at the edges, intricate golden river detail bifurcating, cinematic atmospheric bioluminescence.",
+                "sequence": 3,
+                "narration": "But money flows slowly through the arteries of society. It has to pass hundreds of toll gates before it ever updates your payroll.",
+                "description": "A top-down 0-dimension map view with tiny light rivers branching out in various directions, each becoming dimer the further they move from center hub."
+              },
+              {
+                "prompt": "Hyper-realistic dark retail menu HUD style, neon orange digital flickering numbers showing fast price appreciation, glitch-art particles fly over black minimal luxury display.",
+                "sequence": 4,
+                "narration": "By the time the extra cash finds you—the burger and the stock already reached 110 percent price.",
+                "description": "A close-up luxury digital menu flickering high-speed prices increasing while a transparent bank account stays at zero; neon digits increasing rapidly against charcoal backgrounds."
+              },
+              {
+                "prompt": "Abstract slow motion digital silhouette train track leads into a golden horizon singularity portal dark fog cinematic lighting matte texture movie grain.",
+                "sequence": 5,
+                "narration": "This inequality isn’t luck—if you’re holding on for a paycheck late down logic train—the math will never work.",
+                "description": "Static industrial train heading to 'The End', vanishing in distance with visual 'Asset wealth disparity-focused text layers' blinking dimly behind thick clouds."
+              },
+              {
+                "prompt": "Experimental abstract cinematography, organic movement within light rays across dark textures high isometric visual clarity, premium futuristic documentary grade detail panned slowly left camera moving right down horizontal.",
+                "sequence": 6,
+                "narration": "Don’t ask for higher wages when the supply expands—change proximity. Follow the supply change as wealth enters first phase, avoid the dilution.",
+                "description": "Clean minimal view through microscope of fractal light expansion representing investment assets over cash."
+              }
+            ]
+          },
+          "video": null,
+          "final": null
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "Message a model": [
+      {
+        "json": {
+          "content": {
+            "parts": [
+              {
+                "text": "{\n  \"status\": \"idea created\",\n  \"topic\": \"The $100k Survival Horizon and mathematical escape speed.\",\n  \"title\": \"The First 100K Trap\",\n  \"hashtags\": [\n    \"wealthtransformation\",\n    \"financialgrowth\",\n    \"compoundinterest\",\n    \"investingtips\",\n    \"moneyhacks\",\n    \"entrepreneur\"\n  ],\n  \"script\": {\n    \"scenes\": [\n      {\n        \"sequence\": 1,\n        \"narration\": \"Your first hundred thousand dollars is a graveyard transition.\",\n        \"description\": \"Slow zoom on a minimalist obsidian hourglass with binary digits trickling down.\",\n        \"prompt\": \"Macro cinemagraph, dark mode, close-up of a glass hourglass on a limestone table, filled with glowing gold binary digits '0' and '1', obsidian background, volumetric lighting x-core tech aesthetic.\"\n      },\n      {\n        \"sequence\": 2,\n        \"narration\": \"To the math, this is where momentum goes to die. It’s hard labor, sacrifice, and the soul-crushing drag of living below your means.\",\n        \"description\": \"Visual of a transparent human silhouette hauling massive geometric blocks uphill on a dark plane.\",\n        \"prompt\": \"Isometric shot, 8K, high contrast semi-transparent human figure pulling a massive polished marble monolith upward, floor glows red pulse against the black atmosphere, minimalist futuristic look.\"\n      },\n      {\n        \"sequence\": 3,\n        \"narration\": \"This slog eats almost ten years for most. It’s not a hurdle. It’s a filtration system.\",\n        \"description\": \"Visualizing of floating white screens drifting left, while others dissolve into shadow.\",\n        \"prompt\": \"Clean medical aesthetic, floating semi-transparent interfaces displaying negative financial graphs, soft glowing particles drifting away from cameras, slow lens pan across data depth-map.\"\n      },\n      {\n        \"sequence\": 4,\n        \"narration\": \"But $100k is the specific crossover point where your capital grows faster than you can deposit.\",\n        \"description\": \"Graphs exploding with growth curves into holographic light constellations.\",\n        \"prompt\": \"Hyperspectral view, multiple thin gold lines shooting aggressively vertically like stars, merging into a blinding white nebula of coins/data pixels, extremely dynamic cinematic fast camera jitter.\"\n      },\n      {\n        \"sequence\": 5,\n        \"narration\": \"At year zero, you work for the money. After year 100,000, your money develops a life of its own.\",\n        \"description\": \"A digital forest made of light growing from the last monolith.\",\n        \"prompt\": \"Concept art of a glowing digital tree with neon roots pulsating cyan energy through it to geometric branches representing wealth expansion, night horizon, cinematic moody lighting, hyper-sharp luxury texture.\"\n      },\n      {\n        \"sequence\": 6,\n        \"narration\": \"Build your base, survive the climb and let the math finish the flight.\",\n        \"description\": \"Text overlays the word ASCEND onto a pitch black void, bokeh in the top distance.\",\n        \"prompt\": \"Black background, blurred white light bokeh top screen, soft ethereal glow from center, high texture concrete text typography appearing slowly with cinematic smoke, 4K render.\"\n      }\n    ]\n  }\n}",
+                "thoughtSignature": "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"
+              }
+            ],
+            "role": "model"
+          },
+          "finishReason": "STOP",
+          "index": 0
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "Extract from File": [
+      {
+        "json": {
+          "data": "data1"
+        }
+      }
+    ]
+  },
   "connections": {
     "When clicking ‘Execute workflow’": {
       "main": [
@@ -188,7 +447,13 @@
     },
     "Split Out": {
       "main": [
-        []
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Discord": {
@@ -215,10 +480,16 @@
     },
     "Loop Over Items": {
       "main": [
-        [],
         [
           {
-            "node": "Generate a video",
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Extract from File",
             "type": "main",
             "index": 0
           }
@@ -229,11 +500,76 @@
       "main": [
         [
           {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
             "node": "Loop Over Items",
             "type": "main",
             "index": 0
           }
         ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        []
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Sort",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sort": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        []
       ]
     }
   },
@@ -243,7 +579,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "aaa65b1e-d672-4dbb-96e8-0658d3a36047",
+  "versionId": "10f74af3-1e75-4f7c-83b9-8614f774a090",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "d2cb034ca51b605cb31fc6ca8580e83c36e1213546e9aa603230612919226645"
